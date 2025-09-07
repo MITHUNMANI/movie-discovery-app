@@ -7,7 +7,8 @@ import { SearchPageComponent } from './features/search/search-page/search-page.c
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MovieCardModule } from './shared/movie-card/movie-card.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { ApiHeadersInterceptor } from './core/services/api-headers.interceptor';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
     MovieCardModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: ApiHeadersInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

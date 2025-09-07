@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from 'src/environment/environment';
+import { environment } from '../../../environment/environment.local';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -9,12 +9,11 @@ import { catchError } from 'rxjs/operators';
 })
 export class TmdbService {
   private base = environment.tmdbBaseUrl;
-  private apiKey = environment.tmdbApiKey;
 
   constructor(private http: HttpClient) {}
 
   private params(extra?: Record<string, string | number | boolean>): HttpParams {
-    let p = new HttpParams().set('api_key', this.apiKey).set('language', 'en-US');
+    let p = new HttpParams().set('language', 'en-US');
     if (extra) {
       Object.entries(extra).forEach(([k, v]) => {
         p = p.set(k, String(v));

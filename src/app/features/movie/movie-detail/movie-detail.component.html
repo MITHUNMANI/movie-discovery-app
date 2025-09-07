@@ -1,0 +1,20 @@
+<section *ngIf="movie">
+  <h1>{{ movie.title }}</h1>
+  <div>{{ movie.overview }}</div>
+
+  <div *ngIf="trailerUrl" class="trailer">
+    <iframe [src]="trailerUrl" width="100%" height="400" allowfullscreen></iframe>
+  </div>
+
+  <h3>Cast</h3>
+  <div>
+    <div *ngFor="let c of cast | slice:0:8">{{ c.name }} as {{ c.character }}</div>
+  </div>
+
+  <h3>Similar</h3>
+  <div class="grid">
+    <app-movie-card *ngFor="let mv of similar" [movie]="mv"></app-movie-card>
+  </div>
+</section>
+<div *ngIf="loading">Loading…</div>
+<div *ngIf="error">Error: {{ error }}</div>
