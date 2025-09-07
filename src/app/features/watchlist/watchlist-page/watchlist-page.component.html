@@ -1,0 +1,32 @@
+<div class="watchlist-container container py-4">
+  <h2 class="text-center mb-4">My Watchlist</h2>
+
+  <div *ngIf="searchResults.length > 0">
+    <app-movie-carousel
+      *ngIf="searchType==='movie'"
+      [items]="searchResults"
+      (open)="open($event)">
+    </app-movie-carousel>
+
+    <div *ngIf="searchType==='actor'" class="actor-results">
+      <app-movie-carousel
+    [items]="searchResults"
+    type="actor"
+    >
+  </app-movie-carousel>
+    </div>
+  </div>
+
+  <div *ngIf="!searchResults.length && watchlist && initialWatchlist.length > 0; else emptyList">
+    <app-movie-carousel
+      [items]="watchlist"
+      (open)="open($event)">
+    </app-movie-carousel>
+  </div>
+
+  <ng-template #emptyList>
+    <div class="empty-message text-center py-5">
+      <p>Your watchlist is empty. Add some movies to get started!</p>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,53 @@
+<div class="details container">
+<section *ngIf="!searchActive" class="movie-detail container py-4">
+  <h1 class="mb-3 text-center">{{ movie.title }}</h1>
+  <p class="lead text-muted">{{ movie.overview }}</p>
+
+  <div *ngIf="trailerUrl" class="trailer my-4">
+    <div class="ratio ratio-16x9">
+      <iframe [src]="trailerUrl" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <h3 class="mt-5">Cast</h3>
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+    <div *ngFor="let c of cast | slice:0:12" class="col text-center">
+      <div class="card border-0">
+        <div class="card-body p-2">
+          <strong>{{ c.name }}</strong>
+          <div class="text-muted small">as {{ c.character }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="mt-5">Similar Movies</h3>
+  <app-movie-carousel
+    *ngIf="!loading && !error && similar.length > 0"
+    [items]="similar"
+    (open)="openDetail($event)">
+  </app-movie-carousel>
+</section>
+
+<section *ngIf="searchActive" class="search-results container py-4">
+  <div *ngIf="searchType === 'movie' && searchMovies.length">
+    <h3>Movie Results</h3>
+    <app-movie-carousel [items]="searchMovies" (open)="openDetail($event)"></app-movie-carousel>
+  </div>
+
+  <div *ngIf="searchType === 'actor' && searchActors.length">
+    <h3>Actor Results</h3>
+    <app-movie-carousel
+    [items]="searchActors"
+    type="actor"
+    >
+  </app-movie-carousel>
+  </div>
+
+  <div *ngIf="searchLoading" class="text-muted mt-2">
+    <app-skeleton-loader [count]="5"></app-skeleton-loader>
+  </div>
+  <div *ngIf="searchError" class="text-danger mt-2">Error: {{ searchError }}</div>
+</section>
+</div>
+

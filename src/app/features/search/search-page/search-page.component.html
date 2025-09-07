@@ -1,0 +1,28 @@
+<div class="search-container position-relative">
+  <div class="d-flex">
+    <select class="form-select me-2" (change)="onTypeChange($event)">
+      <option value="movie" [selected]="searchType==='movie'">Movies</option>
+      <option value="actor" [selected]="searchType==='actor'">Actors</option>
+    </select>
+
+    <input
+      class="form-control"
+       [placeholder]="searchType === 'movie' ? 'Search movies...' : 'Search actors...'"
+      [formControl]="searchControl"
+      (focus)="showDropdown = true"
+    />
+
+    <button *ngIf="searchControl.value" class="btn btn-outline-secondary ms-2" (click)="clearSearch()">✕</button>
+  </div>
+
+  <ul *ngIf="showDropdown && suggestions.length" class="dropdown-list list-group position-absolute w-100 zindex-100 mt-1">
+    <li *ngFor="let s of suggestions | slice:0:10"
+        class="list-group-item list-group-item-action"
+        (click)="selectItem(s)">
+      <span *ngIf="searchType==='movie'">{{ s.title }}</span>
+      <span *ngIf="searchType==='actor'">{{ s.name }}</span>
+    </li>
+  </ul>
+
+  <div *ngIf="loading" class="text-muted mt-1">Searching…</div>
+</div>
