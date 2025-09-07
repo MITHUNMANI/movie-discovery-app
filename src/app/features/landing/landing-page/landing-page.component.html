@@ -1,15 +1,33 @@
-<section class="landing">
+<section class="landing container-fluid">
   <h1>What Should I Watch Tonight?</h1>
   <p>Pick a mood and discover movies curated for the vibe.</p>
 
   <div class="moods">
-    <button *ngFor="let m of moods" (click)="selectMood(m)">{{ m.label }}</button>
+    <button *ngFor="let m of moods" (click)="selectMood(m)">
+      {{ m.label }}
+    </button>
+
+  </div>
+  <div *ngIf="loading">
+    <app-skeleton-loader [count]="5"></app-skeleton-loader>
   </div>
 
-  <div *ngIf="loading">Loading…</div>
   <div *ngIf="error" class="error">{{ error }}</div>
+  <app-movie-carousel *ngIf="!loading && !error && movies.length > 0"  [items]="movies"
+  type="movie" (open)="openDetail($event)">
+  </app-movie-carousel>
 
-  <div class="grid">
-    <app-movie-card *ngFor="let mv of movies" [movie]="mv" (open)="openDetail(mv.id)"></app-movie-card>
+  <div *ngIf="!loading && !error && movies.length === 0 && actors.length > 0" class="actor-results">
+    <h3>Actor Results</h3>
+    <app-movie-carousel
+    [items]="actors"
+    type="actor"
+    (open)="openActor($event)">
+  </app-movie-carousel>
   </div>
+  <div *ngIf="!loading && !error && movies.length === 0 && actors.length === 0" class="text-center mt-3">
+    No results found.
+  </div>
+
+
 </section>

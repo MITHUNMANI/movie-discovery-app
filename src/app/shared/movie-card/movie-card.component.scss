@@ -1,0 +1,38 @@
+.movie-card {
+  box-shadow: $card-shadow;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: $card-shadow-hover;
+    transform: translateY(-3px);
+  }
+
+  img {
+    width: 100%;          
+    height: auto;          
+    max-height: 300px;     
+    object-fit: cover;
+  }
+
+  .card-body {
+    text-align: center;
+
+    .btn {
+      margin-top: $space-sm;
+    }
+  }
+}
+
+@media (max-width: 992px) {  
+  .movie-card img {
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 768px) {  
+  .movie-card img {
+    max-height: 180px;
+  }
+}
