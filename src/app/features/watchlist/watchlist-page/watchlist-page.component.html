@@ -1,0 +1,24 @@
+
+<div class="watchlist-container">
+	<h2>My Watchlist</h2>
+	<div *ngIf="watchlist && watchlist.length; else emptyList">
+		<div class="movie-list">
+			<app-movie-card
+				*ngFor="let movie of watchlist"
+				[movie]="movie"
+				(remove)="removeFromWatchlist(movie)"
+				class="movie-card-item"
+			>
+				<div class="movie-card-actions" *ngIf="removeFromWatchlist">
+					<button class="remove-btn" (click)="removeFromWatchlist(movie)">Remove</button>
+				</div>
+			</app-movie-card>
+		</div>
+	</div>
+	<ng-template #emptyList>
+		<div class="empty-message">
+			<p>Your watchlist is empty. Add some movies to get started!</p>
+		</div>
+	</ng-template>
+</div>
+
