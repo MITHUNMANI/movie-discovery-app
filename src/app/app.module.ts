@@ -9,11 +9,13 @@ import { CommonModule } from '@angular/common';
 import { MovieCardModule } from './shared/movie-card/movie-card.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ApiHeadersInterceptor } from './core/services/api-headers.interceptor';
+import { WatchlistPageComponent } from './features/watchlist/watchlist-page/watchlist-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    SearchPageComponent
+    SearchPageComponent,
+    WatchlistPageComponent
   ],
   imports: [
     BrowserModule,
