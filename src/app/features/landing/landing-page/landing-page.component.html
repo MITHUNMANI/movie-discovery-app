@@ -10,6 +10,6 @@
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <div class="grid">
-    <app-movie-card *ngFor="let mv of movies" [movie]="mv" (open)="openDetail($event)"></app-movie-card>
+    <app-movie-card *ngFor="let mv of movies" [movie]="mv" (open)="openDetail(mv.id)"></app-movie-card>
   </div>
 </section>
