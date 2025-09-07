@@ -1,0 +1,16 @@
+<section class="search">
+  <input [formControl]="searchControl" placeholder="Search movies or actors" />
+  <div *ngIf="loading">Searching…</div>
+  <h2 *ngIf="movieResults.length">Movie results</h2>
+  <div class="grid">
+    <app-movie-card *ngFor="let mv of movieResults" [movie]="mv" (open)="openDetail($event)"></app-movie-card>
+  </div>
+
+  <h2 *ngIf="personResults.length">Actor results</h2>
+  <div>
+    <div *ngFor="let p of personResults">
+      <div>{{p.name}}</div>
+      <div *ngIf="p.known_for?.length">Known for: {{ getKnownForNames(p) }}</div>
+    </div>
+  </div>
+</section>
