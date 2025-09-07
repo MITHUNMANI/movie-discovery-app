@@ -1,50 +1,77 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { TmdbService } from 'src/app/core/services/tmdb.service';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
+import { SearchService } from 'src/app/core/services/search.service';
 
 @Component({
-  selector: 'app-search-page',
-  templateUrl: './search-page.component.html'
+  selector: 'app-search',
+  templateUrl: './search-page.component.html',
+  styleUrls: ['./search-page.component.scss']
 })
-export class SearchPageComponent implements OnInit {
+export class SearchPageComponent {
   searchControl = new FormControl('');
-  movieResults: any[] = [];
-  personResults: any[] = [];
+  searchType: 'movie' | 'actor' = 'movie';
+  suggestions: any[] = [];
   loading = false;
-  error = '';
+  showDropdown = false;
 
-  constructor(private tmdb: TmdbService) {}
-
-  ngOnInit(): void {
+  constructor(private tmdb: TmdbService, private searchService: SearchService,private elementRef: ElementRef) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      filter(q => typeof q === 'string' && q.trim().length > 1),
-      tap(() => { this.loading = true; this.error = ''; }),
-      switchMap(q => this.tmdb.searchMovies(q!))
+      filter(q => typeof q === 'string' && q.trim().length > 0),
+      tap(() => { this.loading = true; this.showDropdown = true; }),
+      switchMap(q => {
+        if (this.searchType === 'movie') return this.tmdb.searchMovies(q!);
+        else return this.tmdb.searchPerson(q!);
+      })
     ).subscribe({
-      next: (res) => { this.movieResults = res.results || []; this.loading = false; },
-      error: (err) => { this.error = err.message || 'Search failed'; this.loading = false; }
-    });
-
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      filter(q => typeof q === 'string' && q.trim().length > 1),
-      switchMap(q => this.tmdb.searchPerson(q!))
-    ).subscribe({
-      next: (res) => { this.personResults = res.results || []; },
-      error: () => {}
+      next: (res: any) => {
+        this.suggestions = res.results || [];
+        this.loading = false;
+        this.searchService.update({
+          results: this.suggestions,
+          type: this.searchType,
+          query: this.searchControl.value ?? '',
+          loading: false
+        });
+      },
+      error: () => {
+        this.suggestions = [];
+        this.loading = false;
+        this.searchService.update({ results: [], loading: false });
+      }
     });
   }
 
-  openDetail(event: any): void {
-    console.log('Open detail for:', event);
+  onTypeChange(event: any) {
+    this.searchType = event.target.value;
+    this.clearSearch();
   }
 
-  getKnownForNames(person: any): string {
-  if (!person.known_for || !person.known_for.length) return '';
-  return person.known_for.map((k: any) => k.title || k.name).join(', ');
-}
+  selectItem(item: any) {
+    this.showDropdown = false;
+    this.searchService.update({
+      results: [item],
+      type: this.searchType,
+      query: this.searchType === 'movie' ? item.title : item.name,
+      loading: false
+    });
+  }
+
+  clearSearch() {
+    this.searchControl.setValue('');
+    this.showDropdown = false;
+    this.suggestions = [];
+    this.searchService.reset();
+  }
+
+   @HostListener('document:click', ['$event.target'])
+  onClickOutside(targetElement: any) {
+    const clickedInside = this.elementRef.nativeElement.contains(targetElement);
+    if (!clickedInside) {
+      this.showDropdown = false;
+    }
+  }
 }

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TmdbService } from 'src/app/core/services/tmdb.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { SearchService } from 'src/app/core/services/search.service';
 
 @Component({
   selector: 'app-movie-detail',
-  templateUrl: './movie-detail.component.html'
+  templateUrl: './movie-detail.component.html',
+  styleUrls: ['./movie-detail.component.scss']
 })
 export class MovieDetailComponent implements OnInit {
   movie: any;
@@ -13,15 +15,41 @@ export class MovieDetailComponent implements OnInit {
   similar: any[] = [];
   trailerUrl?: SafeResourceUrl;
   loading = true;
-  error = '';
-
+  error!:any;
+  searchActive = false;
+  searchType: 'movie' | 'actor' = 'movie';
+  searchMovies: any[] = [];
+  searchActors: any[] = [];
+  searchLoading = false;
+  searchError:any = '';
   constructor(
     private route: ActivatedRoute,
     private tmdb: TmdbService,
-    private sanitizer: DomSanitizer
+    private router: Router, 
+    private sanitizer: DomSanitizer,
+    private searchService: SearchService
   ) {}
 
   ngOnInit(): void {
+     this.searchService.search$.subscribe(state => {
+      this.searchActive = !!state.query;
+      this.searchType = state.type;
+      this.searchLoading = state.loading;
+      this.searchError = state.error;
+
+      if (state.type === 'movie') {
+        this.searchMovies = state.results;
+        this.searchActors = [];
+      } else if (state.type === 'actor') {
+        this.searchActors = state.results;
+        this.searchMovies = [];
+      }
+      if (!state.query) {
+        this.searchActive = false;
+        this.searchMovies = [];
+        this.searchActors = [];
+      }
+    });
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.load(id);
   }
@@ -46,4 +74,18 @@ export class MovieDetailComponent implements OnInit {
     this.tmdb.getSimilar(id).subscribe({ next: (s) => this.similar = (s.results || [])});
     this.loading = false;
   }
+
+  openDetail(id: number) {
+    this.router.navigate(['/movie', id]).then(() => {
+      this.load(id);
+    });
+  }
+
+  getKnownForNames(person: any): string {
+  if (!person.known_for || !person.known_for.length) return '';
+  return person.known_for
+    .map((k: any) => k.title ? k.title : k.name)
+    .join(', ');
+}
+
 }

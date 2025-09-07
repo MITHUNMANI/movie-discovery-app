@@ -1,0 +1,19 @@
+<owl-carousel-o [options]="carouselOptions">
+  <ng-container *ngFor="let item of items">
+    <ng-template carouselSlide>
+      <ng-container [ngSwitch]="type">
+        <app-movie-card 
+          *ngSwitchCase="'movie'" 
+          [movie]="item" 
+          (open)="onOpen($event)">
+        </app-movie-card>
+
+        <app-actor-card 
+          *ngSwitchCase="'actor'" 
+          [actor]="item" 
+          (openActor)="onOpen($event)">
+        </app-actor-card>
+      </ng-container>
+    </ng-template>
+  </ng-container>
+</owl-carousel-o>

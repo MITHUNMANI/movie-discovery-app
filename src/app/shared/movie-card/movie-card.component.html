@@ -1,12 +1,16 @@
-<article class="movie-card" (click)="onOpen()" role="button" tabindex="0">
-  <img [src]="movie.poster_path ? (posterBase + movie.poster_path) : 'assets/images/placeholder.png'"
+<div class="card movie-card" (click)="onOpen()" role="button" tabindex="0">
+  <img class="card-img-top"
+       [src]="movie.poster_path ? (posterBase + movie.poster_path) : 'assets/images/placeholder.png'"
        [alt]="movie.title" loading="lazy" />
-  <div class="meta">
-    <h3>{{ movie.title }}</h3>
-    <div class="sub">{{ movie.release_date ? (movie.release_date | date:'yyyy') : '—' }}</div>
-    <div class="rating">⭐ {{ movie.vote_average | number:'1.1-1' }}</div>
-    <button (click)="toggleWatchlist($event)" aria-label="Toggle watchlist">
-      <span *ngIf="!saved">Add</span><span *ngIf="saved">Remove</span>
+  <div class="card-body">
+    <h5 class="card-title">{{ movie.title }}</h5>
+    <p class="card-text">
+      {{ movie.release_date ? (movie.release_date | date:'yyyy') : '—' }} <br>
+      ⭐ {{ movie.vote_average | number:'1.1-1' }}
+    </p>
+    <button class="btn btn-sm btn-danger" (click)="toggleWatchlist($event)">
+      <span *ngIf="!saved">Add to Watchlist</span>
+      <span *ngIf="saved">Remove</span>
     </button>
   </div>
-</article>
+</div>

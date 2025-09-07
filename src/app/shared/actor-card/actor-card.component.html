@@ -1,0 +1,12 @@
+<div class="actor-card" (click)="selectActor()" role="button" tabindex="0">
+  <img
+    [src]="actor.profile_path ? (profileBase + actor.profile_path) : 'assets/images/placeholder.png'"
+    [alt]="actor.name"
+    loading="lazy"
+    class="actor-img"
+  />
+  <div class="actor-info">
+    <h5 class="actor-name">{{ actor.name }}</h5>
+    <p class="actor-known-for">{{ getKnownFor() }}</p>
+  </div>
+</div>
