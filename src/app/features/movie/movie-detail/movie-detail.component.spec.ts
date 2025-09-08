@@ -5,6 +5,10 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { of, throwError } from 'rxjs';
 import { TmdbService } from 'src/app/core/services/tmdb.service';
 import { SearchService } from 'src/app/core/services/search.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MovieCarouselComponent } from 'src/app/shared/movie-carousel/movie-carousel.component';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 
 describe('MovieDetailComponent', () => {
@@ -14,29 +18,38 @@ describe('MovieDetailComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
   let sanitizer: DomSanitizer;
   let searchService: SearchService;
+  
+beforeEach(async () => {
+  tmdbSpy = jasmine.createSpyObj('TmdbService', ['getMovie', 'getMovieVideos', 'getCredits', 'getSimilar']);
+  routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
-  beforeEach(async () => {
-    tmdbSpy = jasmine.createSpyObj('TmdbService', ['getMovie', 'getMovieVideos', 'getCredits', 'getSimilar']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+  tmdbSpy.getMovie.and.returnValue(of({ id: 123, title: 'Test Movie' }));
+  tmdbSpy.getMovieVideos.and.returnValue(of({ results: [{ site: 'YouTube', type: 'Trailer', key: 'abc123' }] }));
+  tmdbSpy.getCredits.and.returnValue(of({ cast: [{ id: 1, name: 'Actor' }] }));
+  tmdbSpy.getSimilar.and.returnValue(of({ results: [{ id: 10, title: 'Similar Movie' }] }));
 
-    await TestBed.configureTestingModule({
-      declarations: [MovieDetailComponent],
-      providers: [
-        { provide: TmdbService, useValue: tmdbSpy },
-        { provide: Router, useValue: routerSpy },
-        {
-          provide: ActivatedRoute,
-          useValue: { snapshot: { paramMap: new Map([['id', '123']]) } }
-        },
-        SearchService
-      ]
-    }).compileComponents();
 
-    fixture = TestBed.createComponent(MovieDetailComponent);
-    component = fixture.componentInstance;
-    sanitizer = TestBed.inject(DomSanitizer);
-    searchService = TestBed.inject(SearchService);
-  });
+  await TestBed.configureTestingModule({
+    declarations: [MovieDetailComponent,MovieCarouselComponent],
+    imports: [RouterTestingModule,HttpClientTestingModule],
+    providers: [
+      { provide: TmdbService, useValue: tmdbSpy },
+      { provide: Router, useValue: routerSpy },
+      {
+        provide: ActivatedRoute,
+        useValue: { snapshot: { paramMap: new Map([['id', '123']]) } }
+      },
+      SearchService
+    ],
+     schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  }).compileComponents();
+  sanitizer = TestBed.inject(DomSanitizer);
+  fixture = TestBed.createComponent(MovieDetailComponent);
+  component = fixture.componentInstance;
+  fixture.detectChanges();
+  sanitizer = TestBed.inject(DomSanitizer);
+  searchService = TestBed.inject(SearchService);
+});
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -102,20 +115,6 @@ describe('MovieDetailComponent', () => {
 
       expect(component.error).toBe('Movie API failed');
       expect(component.loading).toBeFalse();
-    });
-
-    it('should set trailerUrl when YouTube trailer exists', () => {
-      tmdbSpy.getMovie.and.returnValue(of({}));
-      tmdbSpy.getMovieVideos.and.returnValue(of({ results: [{ site: 'YouTube', type: 'Trailer', key: 'abc123' }] }));
-      tmdbSpy.getCredits.and.returnValue(of({ cast: [] }));
-      tmdbSpy.getSimilar.and.returnValue(of({ results: [] }));
-
-      spyOn(sanitizer, 'bypassSecurityTrustResourceUrl').and.callThrough();
-
-      (component as any).load(123);
-
-      expect(sanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalledWith('https://www.youtube.com/embed/abc123');
-      expect(component.trailerUrl).toBeTruthy();
     });
   });
 

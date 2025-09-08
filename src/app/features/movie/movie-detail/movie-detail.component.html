@@ -1,7 +1,7 @@
 <div class="details container">
 <section *ngIf="!searchActive" class="movie-detail container py-4">
-  <h1 class="mb-3 text-center">{{ movie.title }}</h1>
-  <p class="lead text-muted">{{ movie.overview }}</p>
+  <h1 class="mb-3 text-center">{{ movie?.title }}</h1>
+  <p class="lead text-muted">{{ movie?.overview }}</p>
 
   <div *ngIf="trailerUrl" class="trailer my-4">
     <div class="ratio ratio-16x9">

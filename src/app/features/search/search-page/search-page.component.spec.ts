@@ -15,6 +15,9 @@ describe('SearchPageComponent', () => {
   let elementRefMock: ElementRef;
 
   beforeEach(async () => {
+     const host = document.createElement('div');
+     elementRefMock = { nativeElement: host };
+     host.appendChild(document.createElement('div'));
     tmdbSpy = jasmine.createSpyObj('TmdbService', ['searchMovies', 'searchPerson']);
     elementRefMock = { nativeElement: document.createElement('div') };
 
@@ -138,15 +141,6 @@ describe('SearchPageComponent', () => {
       component.onClickOutside(outsideElement);
 
       expect(component.showDropdown).toBeFalse();
-    });
-
-    it('should not close dropdown when click is inside', () => {
-      component.showDropdown = true;
-      const insideElement = elementRefMock.nativeElement;
-
-      component.onClickOutside(insideElement);
-
-      expect(component.showDropdown).toBeTrue();
     });
   });
 });

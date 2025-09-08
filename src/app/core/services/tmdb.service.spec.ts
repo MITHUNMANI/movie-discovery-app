@@ -1,7 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TmdbService } from './tmdb.service';
-import { environment } from 'src/environment/environment';
+import { environment } from 'src/environment/environment.local';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ApiHeadersInterceptor } from './api-headers.interceptor';
 
 describe('TmdbService', () => {
   let service: TmdbService;
@@ -12,7 +14,14 @@ describe('TmdbService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [TmdbService]
+      providers: [
+        TmdbService,
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: ApiHeadersInterceptor,
+          multi: true
+        }
+      ]
     });
 
     service = TestBed.inject(TmdbService);
